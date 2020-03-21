@@ -1,6 +1,12 @@
 <mat-toolbar color="primary">
-  <span>Waog's ng-kata</span>
+  <a mat-button routerLink="home">
+    <span class="mat-headline">
+      Waog's ng-kata
+    </span>
+  </a>
 
-  <a mat-button href="#home">home</a>
-  <a mat-button href="#list">list</a>
+  <a mat-button routerLink="home">home</a>
+  <a mat-button routerLink="list">list</a>
 </mat-toolbar>
+
+<router-outlet></router-outlet>
