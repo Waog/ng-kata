@@ -1,5 +1,5 @@
 import { RouterTestingModule } from "@angular/router/testing";
-import helper from "src/testing/helper";
+import helper, { toArray } from "src/testing/helper";
 import { AppComponent } from "./app.component";
 import { MaterialModule } from "./material/material.module";
 
@@ -13,10 +13,6 @@ const setupComponentClass = async () =>
   helper.setupComponentClass(componentClass, moduleDef);
 
 const setupElement = async () => helper.setupElement(componentClass, moduleDef);
-
-function toArray(nodeList: NodeListOf<HTMLAnchorElement>): HTMLAnchorElement[] {
-  return Array.prototype.slice.call(nodeList);
-}
 
 function getRouterLinks(parent: HTMLElement): HTMLAnchorElement[] {
   const routerLinks: NodeListOf<HTMLAnchorElement> = parent.querySelectorAll(

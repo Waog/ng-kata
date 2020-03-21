@@ -1,7 +1,8 @@
+import { Type } from "@angular/core";
 import { TestBed, TestModuleMetadata } from "@angular/core/testing";
 
-async function setupFixture(
-  componentClass: any,
+async function setupFixture<T>(
+  componentClass: Type<T>,
   moduleDef: TestModuleMetadata
 ) {
   await TestBed.configureTestingModule(moduleDef).compileComponents();
@@ -9,8 +10,8 @@ async function setupFixture(
   return { fixture };
 }
 
-async function setupComponentClass(
-  componentClass: any,
+async function setupComponentClass<T>(
+  componentClass: Type<T>,
   moduleDef: TestModuleMetadata
 ) {
   const { fixture } = await setupFixture(componentClass, moduleDef);
@@ -18,8 +19,8 @@ async function setupComponentClass(
   return { fixture, component };
 }
 
-async function setupElement(
-  componentClass: any,
+async function setupElement<T>(
+  componentClass: Type<T>,
   moduleDef: TestModuleMetadata
 ) {
   const { fixture } = await setupFixture(componentClass, moduleDef);
@@ -28,4 +29,16 @@ async function setupElement(
   return { fixture, element };
 }
 
-export default { setupComponentClass, setupElement };
+async function setupComponent<T>(
+  componentClass: Type<T>,
+  moduleDef: TestModuleMetadata
+) {
+  const { fixture, element } = await setupElement(componentClass, moduleDef);
+  return { fixture, element, component: fixture.componentInstance };
+}
+
+export function toArray<T extends Node>(nodeList: NodeListOf<T>): T[] {
+  return Array.prototype.slice.call(nodeList);
+}
+
+export default { setupComponentClass, setupElement, setupComponent, toArray };
