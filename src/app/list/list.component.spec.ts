@@ -21,8 +21,10 @@ describe("ListComponent", () => {
 
   it("should render a material list with items", async () => {
     const { element } = await setupElement();
-    const matList = element.querySelector("mat-list");
-    const matListItems = element.querySelectorAll("mat-list > mat-list-item");
+    const matList = element.querySelector("mat-selection-list");
+    const matListItems = element.querySelectorAll(
+      "mat-selection-list > mat-list-option"
+    );
     expect(matList).toBeTruthy();
     expect(matListItems.length).toBeGreaterThan(0);
   });
