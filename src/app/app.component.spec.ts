@@ -1,29 +1,18 @@
-import { TestBed } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
+import helper from "src/testing/helper";
 import { AppComponent } from "./app.component";
 import { MaterialModule } from "./material/material.module";
 
-async function setupFixture() {
-  await TestBed.configureTestingModule({
-    imports: [RouterTestingModule, MaterialModule],
-    declarations: [AppComponent]
-  }).compileComponents();
-  const fixture = TestBed.createComponent(AppComponent);
-  return { fixture };
-}
+const componentClass = AppComponent;
+const moduleDef = {
+  imports: [RouterTestingModule, MaterialModule],
+  declarations: [componentClass]
+};
 
-async function setupComponentClass() {
-  const { fixture } = await setupFixture();
-  const component = fixture.componentInstance;
-  return { fixture, component };
-}
+const setupComponentClass = async () =>
+  helper.setupComponentClass(componentClass, moduleDef);
 
-async function setupElement() {
-  const { fixture } = await setupFixture();
-  fixture.detectChanges();
-  const element: HTMLElement = fixture.nativeElement;
-  return { fixture, element };
-}
+const setupElement = async () => helper.setupElement(componentClass, moduleDef);
 
 function toArray(nodeList: NodeListOf<HTMLAnchorElement>): HTMLAnchorElement[] {
   return Array.prototype.slice.call(nodeList);
