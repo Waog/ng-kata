@@ -2,9 +2,9 @@
   <mat-list-option
     checkboxPosition="before"
     *ngFor="let todo of todos"
-    [value]="todo"
+    [value]="todo.id"
   >
-    {{ todo }}
+    {{ todo.text }}
   </mat-list-option>
 </mat-selection-list>
 

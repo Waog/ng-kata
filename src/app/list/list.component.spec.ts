@@ -23,6 +23,33 @@ describe("ListComponent", () => {
     expect(component).toBeTruthy();
   });
 
+  it("should get the checked items correctly", async () => {
+    const { component } = await setupComponentClass();
+    component.todos = [
+      { id: 1, checked: false },
+      { id: 2, checked: true },
+      { id: 3, checked: true }
+    ] as any;
+    expect(component.checkedTodos).toEqual([2, 3]);
+  });
+
+  it("should set the checked items correctly", async () => {
+    const { component } = await setupComponentClass();
+    component.todos = [
+      { id: 1, checked: true },
+      { id: 2, checked: true },
+      { id: 3, checked: false }
+    ] as any;
+
+    component.checkedTodos = [2, 3];
+
+    expect(component.todos).toEqual([
+      { id: 1, checked: false },
+      { id: 2, checked: true },
+      { id: 3, checked: true }
+    ] as any);
+  });
+
   it("should render a material list", async () => {
     const { element } = await setupElement();
     const matList = element.querySelector("mat-selection-list");
@@ -31,7 +58,7 @@ describe("ListComponent", () => {
 
   it("should render it's items", async () => {
     const { component, element } = await setupComponent();
-    const classItems = component.todos;
+    const classItems = component.todos.map(todo => todo.text);
     const matListItems = element.querySelectorAll(
       "mat-selection-list > mat-list-option"
     ) as NodeListOf<HTMLLIElement>; // hack, because no material types exist
@@ -43,7 +70,9 @@ describe("ListComponent", () => {
   it("should render checkmarks for checked items", async () => {
     const { fixture, component, element } = await setupComponent();
     fixture.detectChanges();
-    const classItems = component.checkedTodos;
+    const checkedTexts = component.todos
+      .filter(todo => todo.checked)
+      .map(todo => todo.text);
     const checkboxNodes = element.querySelectorAll(
       "mat-selection-list > mat-list-option mat-pseudo-checkbox"
     );
@@ -55,6 +84,6 @@ describe("ListComponent", () => {
     const checkedElementTexts = checkedCheckboxes.map(
       checkboxElem => checkboxElem.parentElement.innerText
     );
-    expect(checkedElementTexts).toEqual(classItems);
+    expect(checkedElementTexts).toEqual(checkedTexts);
   });
 });
