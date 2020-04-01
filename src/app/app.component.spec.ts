@@ -22,20 +22,20 @@ function getRouterLinks(parent: HTMLElement): HTMLAnchorElement[] {
 }
 
 describe("AppComponent", () => {
-  it("should create the app", async () => {
+  it("creates the app", async () => {
     const { component } = await setupComponentClass();
 
     expect(component).toBeTruthy();
   });
 
-  it("should render a navigation item 'list'", async () => {
+  it("renders a navigation item 'list'", async () => {
     const { element } = await setupElement();
     const routerLinks: HTMLAnchorElement[] = getRouterLinks(element);
     const linkTexts: String[] = routerLinks.map(elem => `${elem.textContent}`);
     expect(linkTexts).toContain("list");
   });
 
-  it("should provide a link to '/list'", async () => {
+  it("provides a link to '/list'", async () => {
     const { element } = await setupElement();
     const routerLinks: HTMLAnchorElement[] = getRouterLinks(element);
     const linksToList: HTMLAnchorElement[] = routerLinks.filter(elem =>

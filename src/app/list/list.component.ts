@@ -1,5 +1,7 @@
 import { Component } from "@angular/core";
 import * as _ from "lodash";
+import { ListService } from "./list.service";
+import Todo from "./todo";
 
 @Component({
   selector: "app-list",
@@ -7,16 +9,17 @@ import * as _ from "lodash";
   styleUrls: ["./list.component.scss"]
 })
 export class ListComponent {
-  public todos = [
-    { id: 1, text: "Clean up", checked: false },
-    { id: 2, text: "bla bla", checked: false },
-    { id: 3, text: "homework", checked: true }
-  ];
+  constructor(public listService: ListService) {}
 
-  private cachedCheckedTodoIds = []; // workaround for https://github.com/angular/angular/issues/11097
+  private cachedCheckedTodoIds: number[] = []; // workaround for https://github.com/angular/angular/issues/11097
+
+  public get todos(): Todo[] {
+    // TODO: use observables instead; (possible with setter?)
+    return this.listService.getTodos();
+  }
 
   public get checkedTodos(): number[] {
-    const result = this.todos.filter(todo => todo.checked).map(todo => todo.id);
+    const result = this.listService.getCheckedIds();
     if (_.isEqual(result, this.cachedCheckedTodoIds)) {
       return this.cachedCheckedTodoIds;
     }
@@ -25,6 +28,6 @@ export class ListComponent {
   }
 
   public set checkedTodos(checkedIds: number[]) {
-    this.todos.forEach(todo => (todo.checked = checkedIds.includes(todo.id)));
+    this.listService.setCheckedIds(checkedIds);
   }
 }

@@ -1,89 +1,126 @@
+import { TestBed } from "@angular/core/testing";
 import { FormsModule } from "@angular/forms";
-import helper, { toArray } from "src/testing/helper";
+import helper from "src/testing/helper";
+import { provideMock, Spied } from "src/testing/jasmine.extensions";
 import { MaterialModule } from "../material/material.module";
 import { ListComponent } from "./list.component";
+import ListComponentDriver from "./list.component.driver.spec";
+import { ListService } from "./list.service";
+import Todo from "./todo";
 
 const componentClass = ListComponent;
-const moduleDef = {
-  imports: [MaterialModule, FormsModule],
-  declarations: [componentClass]
+const createModuleDef = () => {
+  return {
+    imports: [MaterialModule, FormsModule],
+    declarations: [componentClass],
+    providers: [provideMock(ListService)]
+  };
 };
 
 const setupComponentClass = async () =>
-  helper.setupComponentClass(componentClass, moduleDef);
+  helper.setupComponentClass(componentClass, createModuleDef());
 
-const setupElement = async () => helper.setupElement(componentClass, moduleDef);
+const setupElement = async () =>
+  helper.setupElement(componentClass, createModuleDef());
 
 const setupComponent = async () =>
-  helper.setupComponent(componentClass, moduleDef);
+  helper.setupComponent(componentClass, createModuleDef());
 
 describe("ListComponent", () => {
-  it("should create", async () => {
+  it("creates", async () => {
     const { component } = await setupComponentClass();
+
     expect(component).toBeTruthy();
   });
 
-  it("should get the checked items correctly", async () => {
+  it("initializes with dependencies", async () => {
     const { component } = await setupComponentClass();
-    component.todos = [
-      { id: 1, checked: false },
-      { id: 2, checked: true },
-      { id: 3, checked: true }
-    ] as any;
-    expect(component.checkedTodos).toEqual([2, 3]);
+
+    const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
+
+    expect(component.listService).toBe(listServiceSpy);
   });
 
-  it("should set the checked items correctly", async () => {
-    const { component } = await setupComponentClass();
-    component.todos = [
-      { id: 1, checked: true },
-      { id: 2, checked: true },
-      { id: 3, checked: false }
-    ] as any;
+  it("mirrors ListService's Todos'", async () => {
+    const todos: Todo[] = [{}, {}] as any;
+    const { component, fixture } = await setupComponentClass();
+    const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
+    listServiceSpy.getTodos.and.returnValue(todos);
 
-    component.checkedTodos = [2, 3];
-
-    expect(component.todos).toEqual([
-      { id: 1, checked: false },
-      { id: 2, checked: true },
-      { id: 3, checked: true }
-    ] as any);
-  });
-
-  it("should render a material list", async () => {
-    const { element } = await setupElement();
-    const matList = element.querySelector("mat-selection-list");
-    expect(matList).toBeTruthy();
-  });
-
-  it("should render it's items", async () => {
-    const { component, element } = await setupComponent();
-    const classItems = component.todos.map(todo => todo.text);
-    const matListItems = element.querySelectorAll(
-      "mat-selection-list > mat-list-option"
-    ) as NodeListOf<HTMLLIElement>; // hack, because no material types exist
-    const matListItemsArr = toArray(matListItems);
-    const elemItems = matListItemsArr.map(elem => elem.innerText);
-    expect(elemItems).toEqual(classItems);
-  });
-
-  it("should render checkmarks for checked items", async () => {
-    const { fixture, component, element } = await setupComponent();
     fixture.detectChanges();
-    const checkedTexts = component.todos
-      .filter(todo => todo.checked)
-      .map(todo => todo.text);
-    const checkboxNodes = element.querySelectorAll(
-      "mat-selection-list > mat-list-option mat-pseudo-checkbox"
-    );
-    const checkboxArr = toArray(checkboxNodes);
-    const checkedCheckboxes = checkboxArr.filter(
-      checkboxElem =>
-        checkboxElem.getAttribute("ng-reflect-state") === "checked"
-    );
-    const checkedElementTexts = checkedCheckboxes.map(
-      checkboxElem => checkboxElem.parentElement.innerText
-    );
+
+    expect(component.todos).toBe(todos);
+  });
+
+  it("mirrors ListService's checked state", async () => {
+    const checkedIds = [2, 3];
+    const { component, fixture } = await setupComponentClass();
+    const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
+
+    listServiceSpy.getCheckedIds.and.returnValue(checkedIds);
+    fixture.detectChanges();
+
+    expect(component.checkedTodos).toEqual(checkedIds);
+    expect(listServiceSpy.getCheckedIds).toHaveBeenCalled();
+  });
+
+  it("sets checked state on ListService", async () => {
+    const checkedIds = [2, 3];
+    const { component, fixture } = await setupComponentClass();
+    const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
+
+    fixture.detectChanges();
+    component.checkedTodos = checkedIds;
+
+    expect(listServiceSpy.setCheckedIds).toHaveBeenCalledWith(checkedIds);
+    expect(listServiceSpy.setCheckedIds).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders a list", async () => {
+    const { element } = await setupElement();
+    const driver = new ListComponentDriver(element);
+    expect(driver.getListNode()).toBeTruthy();
+  });
+
+  it("renders the item texts from ListService", async () => {
+    const todos: Todo[] = [
+      { id: 1, checked: false, text: "A" },
+      { id: 2, checked: false, text: "B" }
+    ];
+    const todoTexts = ["A", "B"];
+    const checkedIds = [];
+    const { element, fixture } = await setupComponent();
+    const driver = new ListComponentDriver(element);
+    const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
+    listServiceSpy.getTodos.and.returnValue(todos);
+    listServiceSpy.getCheckedIds.and.returnValue(checkedIds);
+
+    fixture.detectChanges();
+    const itemTexts = driver.getItemTexts();
+
+    expect(itemTexts).toEqual(todoTexts);
+  });
+
+  it("renders the checkmarks of checked todos", async () => {
+    // TODO: try to reduce input to the minimum
+    const todos: Todo[] = [
+      { id: 1, checked: false, text: "A" },
+      { id: 2, checked: true, text: "B" },
+      { id: 3, checked: true, text: "C" }
+    ];
+    const checkedIds = [2, 3];
+    const checkedTexts = ["B", "C"];
+    const { fixture, component, element } = await setupComponent();
+    const driver = new ListComponentDriver(element);
+    const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
+    listServiceSpy.getTodos.and.returnValue(todos);
+    listServiceSpy.getCheckedIds.and.returnValue(checkedIds);
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const checkedElementTexts = driver.getCheckedItemTexts();
     expect(checkedElementTexts).toEqual(checkedTexts);
   });
 });
