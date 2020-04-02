@@ -22,7 +22,7 @@ describe("ListComponent", () => {
 
     const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
 
-    expect(component.listService).toBe(listServiceSpy);
+    expect((component as any).listService).toBe(listServiceSpy);
   });
 
   it("mirrors ListService's Todos'", async () => {

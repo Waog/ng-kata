@@ -9,8 +9,7 @@ import Todo from "./todo";
   styleUrls: ["./list.component.scss"]
 })
 export class ListComponent {
-  // TODO: internalize listService
-  constructor(public listService: ListService) {}
+  constructor(private listService: ListService) {}
 
   private cachedCheckedTodoIds: number[] = []; // workaround for https://github.com/angular/angular/issues/11097
 
