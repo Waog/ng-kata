@@ -65,41 +65,32 @@ describe("ListComponent", () => {
   });
 
   it("renders the item texts from ListService", async () => {
-    // TODO: try to reduce input to the minimum
     const { driver } = await ListComponentDriver.setupWithSpies();
     const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
-    const todos: Todo[] = [
-      { id: 1, checked: false, text: "A" },
-      { id: 2, checked: false, text: "B" }
-    ];
-    const todoTexts = ["A", "B"];
-    const checkedIds = [];
+    const todos: Todo[] = [{ text: "A" }, { text: "B" }] as any;
 
     listServiceSpy.getTodos.and.returnValue(todos);
-    listServiceSpy.getCheckedIds.and.returnValue(checkedIds);
     await driver.sync();
 
     const itemTexts = driver.getItemTexts();
-    expect(itemTexts).toEqual(todoTexts);
+    expect(itemTexts).toEqual(["A", "B"]);
   });
 
   it("renders the checkmarks of checked todos", async () => {
-    // TODO: try to reduce input to the minimum
     const { driver } = await ListComponentDriver.setupWithSpies();
     const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
     const todos: Todo[] = [
-      { id: 1, checked: false, text: "A" },
-      { id: 2, checked: true, text: "B" },
-      { id: 3, checked: true, text: "C" }
-    ];
+      { id: 1, text: "A" },
+      { id: 2, text: "B" },
+      { id: 3, text: "C" }
+    ] as any;
     const checkedIds = [2, 3];
-    const checkedTexts = ["B", "C"];
 
     listServiceSpy.getTodos.and.returnValue(todos);
     listServiceSpy.getCheckedIds.and.returnValue(checkedIds);
     await driver.sync();
 
     const checkedElementTexts = driver.getCheckedItemTexts();
-    expect(checkedElementTexts).toEqual(checkedTexts);
+    expect(checkedElementTexts).toEqual(["B", "C"]);
   });
 });
