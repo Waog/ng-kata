@@ -1,5 +1,6 @@
 import ListComponentDriver from "./list.component.driver.spec";
 
+// TODO: DRY (all detectChanges and whenStable)
 describe("List integration", () => {
   it("can be created", async () => {
     const { component } = await ListComponentDriver.setupWithDeps();
@@ -8,57 +9,49 @@ describe("List integration", () => {
   });
 
   it("initializes with 3 Todos", async () => {
-    const { driver, fixture } = await ListComponentDriver.setupWithDeps();
+    const { driver } = await ListComponentDriver.setupWithDeps();
 
-    fixture.detectChanges();
     const items = driver.getItemTexts();
-
     expect(items.length).toEqual(3);
   });
 
-  it("initializes with 2 checked Todos", async () => {
+  it("initializes with some checked Todos", async () => {
     const { driver, fixture } = await ListComponentDriver.setupWithDeps();
-
-    fixture.detectChanges();
-    await fixture.whenStable();
-    fixture.detectChanges();
+    fixture.detectChanges(); // why is this necessary a second time?
 
     const checkedItems = driver.getCheckedItemTexts();
-    expect(checkedItems.length).toEqual(2);
+    expect(checkedItems.length).toBeGreaterThan(0);
+  });
+
+  it("initializes with some unchecked Todos", async () => {
+    const { driver, fixture } = await ListComponentDriver.setupWithDeps();
+    fixture.detectChanges(); // why is this necessary a second time?
+
+    const uncheckedItems = driver.getUncheckedItemTexts();
+    expect(uncheckedItems.length).toBeGreaterThan(0);
   });
 
   it("unchecks clicked checked items", async () => {
     const { driver, fixture } = await ListComponentDriver.setupWithDeps();
+    fixture.detectChanges(); // why is this necessary a second time?
+    const itemToClick: string = driver.getCheckedItemTexts()[0];
+    expect(driver.isDone(itemToClick)).toBeTrue();
 
-    // TODO: DRY (all detectChanges & whenStables)
-    fixture.detectChanges();
-    await fixture.whenStable();
-    fixture.detectChanges();
+    driver.clickItem(itemToClick);
+    fixture.detectChanges(); // update the view
 
-    const clickedItem: string = driver.getCheckedItemTexts()[0];
-    expect(driver.isDone(clickedItem)).toBeTrue();
-
-    driver.clickItem(clickedItem);
-    await fixture.whenStable();
-    fixture.detectChanges();
-
-    expect(driver.isDone(clickedItem)).toBeFalse();
+    expect(driver.isDone(itemToClick)).toBeFalse();
   });
 
   it("checks clicked unchecked items", async () => {
     const { driver, fixture } = await ListComponentDriver.setupWithDeps();
-
     fixture.detectChanges();
-    await fixture.whenStable();
-    fixture.detectChanges();
+    const itemToClick: string = driver.getUncheckedItemTexts()[0];
+    expect(driver.isDone(itemToClick)).toBeFalse();
 
-    const clickedItem: string = driver.getUncheckedItemTexts()[0];
-    expect(driver.isDone(clickedItem)).toBeFalse();
+    driver.clickItem(itemToClick);
+    fixture.detectChanges(); // update the view
 
-    driver.clickItem(clickedItem);
-    await fixture.whenStable();
-    fixture.detectChanges();
-
-    expect(driver.isDone(clickedItem)).toBeTrue();
+    expect(driver.isDone(itemToClick)).toBeTrue();
   });
 });
