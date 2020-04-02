@@ -10,9 +10,10 @@ type HTMLMatListOptionElement = HTMLLIElement; // hack, because no material type
 type HTMLMatSelectionListElement = HTMLUListElement; // hack, because no material types exist
 
 export default class ListComponentDriver {
+  // TODO: internalize if possible
   public component: ListComponent;
   public element: HTMLElement;
-  public fixture: ComponentFixture<ListComponent>; // TODO: internalize if possible
+  public fixture: ComponentFixture<ListComponent>;
 
   public static async setupWithSpies() {
     return ListComponentDriver.setupDriver(true);
@@ -36,14 +37,14 @@ export default class ListComponentDriver {
   private constructor() {}
 
   private async init(useSpies: boolean) {
-    const { component, element, fixture } = await this.setupComponent(useSpies);
+    const { component, element, fixture } = await this.setupTestBed(useSpies);
     this.component = component;
     this.element = element;
     this.fixture = fixture;
   }
 
-  private async setupComponent(useSpies: boolean) {
-    return helper.setupComponent(ListComponent, this.createModuleDef(useSpies));
+  private async setupTestBed(useSpies: boolean) {
+    return helper.setupTestBed(ListComponent, this.createModuleDef(useSpies));
   }
 
   private createModuleDef(useSpies: boolean) {

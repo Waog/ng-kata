@@ -3,16 +3,14 @@ import helper, { toArray } from "src/testing/helper";
 import { AppComponent } from "./app.component";
 import { MaterialModule } from "./material/material.module";
 
+// TODO: move test config to test driver
 const componentClass = AppComponent;
 const moduleDef = {
   imports: [RouterTestingModule, MaterialModule],
   declarations: [componentClass]
 };
 
-const setupComponentClass = async () =>
-  helper.setupComponentClass(componentClass, moduleDef);
-
-const setupElement = async () => helper.setupElement(componentClass, moduleDef);
+const setupTestBed = async () => helper.setupTestBed(componentClass, moduleDef);
 
 function getRouterLinks(parent: HTMLElement): HTMLAnchorElement[] {
   const routerLinks: NodeListOf<HTMLAnchorElement> = parent.querySelectorAll(
@@ -23,20 +21,20 @@ function getRouterLinks(parent: HTMLElement): HTMLAnchorElement[] {
 
 describe("AppComponent", () => {
   it("creates the app", async () => {
-    const { component } = await setupComponentClass();
+    const { component } = await setupTestBed();
 
     expect(component).toBeTruthy();
   });
 
   it("renders a navigation item 'list'", async () => {
-    const { element } = await setupElement();
+    const { element } = await setupTestBed();
     const routerLinks: HTMLAnchorElement[] = getRouterLinks(element);
     const linkTexts: String[] = routerLinks.map(elem => `${elem.textContent}`);
     expect(linkTexts).toContain("list");
   });
 
   it("provides a link to '/list'", async () => {
-    const { element } = await setupElement();
+    const { element } = await setupTestBed();
     const routerLinks: HTMLAnchorElement[] = getRouterLinks(element);
     const linksToList: HTMLAnchorElement[] = routerLinks.filter(elem =>
       elem.href.endsWith("/list")
