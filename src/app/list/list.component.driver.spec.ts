@@ -1,10 +1,66 @@
-import { toArray } from "src/testing/helper";
+import { ComponentFixture } from "@angular/core/testing";
+import { FormsModule } from "@angular/forms";
+import helper, { toArray } from "src/testing/helper";
+import { provideMock } from "src/testing/jasmine.extensions";
+import { MaterialModule } from "../material/material.module";
+import { ListComponent } from "./list.component";
+import { ListService } from "./list.service";
 
 type HTMLMatListOptionElement = HTMLLIElement; // hack, because no material types exist
 type HTMLMatSelectionListElement = HTMLUListElement; // hack, because no material types exist
 
 export default class ListComponentDriver {
-  constructor(private element: HTMLElement) {}
+  public component: ListComponent;
+  public element: HTMLElement;
+  public fixture: ComponentFixture<ListComponent>; // TODO: internalize if possible
+
+  public static async setupWithSpies() {
+    return ListComponentDriver.setupDriver(true);
+  }
+
+  public static async setupWithDeps() {
+    return ListComponentDriver.setupDriver(false);
+  }
+
+  private static async setupDriver(useSpies: boolean) {
+    const driver = new ListComponentDriver();
+    await driver.init(useSpies);
+    return {
+      driver,
+      component: driver.component,
+      element: driver.element,
+      fixture: driver.fixture
+    };
+  }
+
+  private constructor() {}
+
+  private async init(useSpies: boolean) {
+    const { component, element, fixture } = await this.setupComponent(useSpies);
+    this.component = component;
+    this.element = element;
+    this.fixture = fixture;
+  }
+
+  private async setupComponent(useSpies: boolean) {
+    return helper.setupComponent(ListComponent, this.createModuleDef(useSpies));
+  }
+
+  private createModuleDef(useSpies: boolean) {
+    return {
+      imports: [MaterialModule, FormsModule],
+      declarations: [ListComponent],
+      providers: useSpies ? this.getSpyProviders() : this.getOriginalProviders()
+    };
+  }
+
+  private getSpyProviders() {
+    return [provideMock(ListService)];
+  }
+
+  private getOriginalProviders() {
+    return [ListService];
+  }
 
   getListNode(): HTMLMatSelectionListElement {
     return this.element.querySelector("mat-selection-list");

@@ -1,38 +1,14 @@
-import { FormsModule } from "@angular/forms";
-import helper from "src/testing/helper";
-import { MaterialModule } from "../material/material.module";
-import { ListComponent } from "./list.component";
 import ListComponentDriver from "./list.component.driver.spec";
-import { ListService } from "./list.service";
-
-const componentClass = ListComponent;
-const createModuleDef = () => {
-  return {
-    imports: [MaterialModule, FormsModule],
-    declarations: [componentClass],
-    providers: [ListService]
-  };
-};
-
-const setupComponentClass = async () =>
-  helper.setupComponentClass(componentClass, createModuleDef());
-
-const setupElement = async () =>
-  helper.setupElement(componentClass, createModuleDef());
-
-const setupComponent = async () =>
-  helper.setupComponent(componentClass, createModuleDef());
 
 describe("List integration", () => {
   it("can be created", async () => {
-    const { component } = await setupComponentClass();
+    const { component } = await ListComponentDriver.setupWithDeps();
 
     expect(component).toBeTruthy();
   });
 
   it("initializes with 3 Todos", async () => {
-    const { element, fixture } = await setupComponent();
-    const driver = new ListComponentDriver(element);
+    const { driver, fixture } = await ListComponentDriver.setupWithDeps();
 
     fixture.detectChanges();
     const items = driver.getItemTexts();
@@ -41,8 +17,7 @@ describe("List integration", () => {
   });
 
   it("initializes with 2 checked Todos", async () => {
-    const { fixture, component, element } = await setupComponent();
-    const driver = new ListComponentDriver(element);
+    const { driver, fixture } = await ListComponentDriver.setupWithDeps();
 
     fixture.detectChanges();
     await fixture.whenStable();
@@ -53,8 +28,7 @@ describe("List integration", () => {
   });
 
   it("unchecks clicked checked items", async () => {
-    const { fixture, component, element } = await setupComponent();
-    const driver = new ListComponentDriver(element);
+    const { driver, fixture } = await ListComponentDriver.setupWithDeps();
 
     // TODO: DRY (all detectChanges & whenStables)
     fixture.detectChanges();
@@ -72,8 +46,7 @@ describe("List integration", () => {
   });
 
   it("checks clicked unchecked items", async () => {
-    const { fixture, component, element } = await setupComponent();
-    const driver = new ListComponentDriver(element);
+    const { driver, fixture } = await ListComponentDriver.setupWithDeps();
 
     fixture.detectChanges();
     await fixture.whenStable();

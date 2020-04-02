@@ -1,40 +1,20 @@
 import { TestBed } from "@angular/core/testing";
-import { FormsModule } from "@angular/forms";
-import helper from "src/testing/helper";
-import { provideMock, Spied } from "src/testing/jasmine.extensions";
-import { MaterialModule } from "../material/material.module";
-import { ListComponent } from "./list.component";
+import { Spied } from "src/testing/jasmine.extensions";
 import ListComponentDriver from "./list.component.driver.spec";
 import { ListService } from "./list.service";
 import Todo from "./todo";
 
-const componentClass = ListComponent;
-const createModuleDef = () => {
-  return {
-    imports: [MaterialModule, FormsModule],
-    declarations: [componentClass],
-    providers: [provideMock(ListService)]
-  };
-};
-
-const setupComponentClass = async () =>
-  helper.setupComponentClass(componentClass, createModuleDef());
-
-const setupElement = async () =>
-  helper.setupElement(componentClass, createModuleDef());
-
-const setupComponent = async () =>
-  helper.setupComponent(componentClass, createModuleDef());
-
 describe("ListComponent", () => {
   it("creates", async () => {
-    const { component } = await setupComponentClass();
+    const { driver } = await ListComponentDriver.setupWithSpies();
 
-    expect(component).toBeTruthy();
+    expect(driver).toBeTruthy();
+    expect(driver.component).toBeTruthy();
+    expect(driver.element).toBeTruthy();
   });
 
   it("initializes with dependencies", async () => {
-    const { component } = await setupComponentClass();
+    const { component } = await ListComponentDriver.setupWithSpies();
 
     const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
 
@@ -43,7 +23,7 @@ describe("ListComponent", () => {
 
   it("mirrors ListService's Todos'", async () => {
     const todos: Todo[] = [{}, {}] as any;
-    const { component, fixture } = await setupComponentClass();
+    const { component, fixture } = await ListComponentDriver.setupWithSpies();
     const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
     listServiceSpy.getTodos.and.returnValue(todos);
 
@@ -54,7 +34,7 @@ describe("ListComponent", () => {
 
   it("mirrors ListService's checked state", async () => {
     const checkedIds = [2, 3];
-    const { component, fixture } = await setupComponentClass();
+    const { component, fixture } = await ListComponentDriver.setupWithSpies();
     const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
 
     listServiceSpy.getCheckedIds.and.returnValue(checkedIds);
@@ -66,7 +46,7 @@ describe("ListComponent", () => {
 
   it("sets checked state on ListService", async () => {
     const checkedIds = [2, 3];
-    const { component, fixture } = await setupComponentClass();
+    const { component, fixture } = await ListComponentDriver.setupWithSpies();
     const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
 
     fixture.detectChanges();
@@ -77,8 +57,7 @@ describe("ListComponent", () => {
   });
 
   it("renders a list", async () => {
-    const { element } = await setupElement();
-    const driver = new ListComponentDriver(element);
+    const { driver } = await ListComponentDriver.setupWithSpies();
     expect(driver.getListNode()).toBeTruthy();
   });
 
@@ -89,8 +68,7 @@ describe("ListComponent", () => {
     ];
     const todoTexts = ["A", "B"];
     const checkedIds = [];
-    const { element, fixture } = await setupComponent();
-    const driver = new ListComponentDriver(element);
+    const { driver, fixture } = await ListComponentDriver.setupWithSpies();
     const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
     listServiceSpy.getTodos.and.returnValue(todos);
     listServiceSpy.getCheckedIds.and.returnValue(checkedIds);
@@ -110,8 +88,7 @@ describe("ListComponent", () => {
     ];
     const checkedIds = [2, 3];
     const checkedTexts = ["B", "C"];
-    const { fixture, component, element } = await setupComponent();
-    const driver = new ListComponentDriver(element);
+    const { driver, fixture } = await ListComponentDriver.setupWithSpies();
     const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
     listServiceSpy.getTodos.and.returnValue(todos);
     listServiceSpy.getCheckedIds.and.returnValue(checkedIds);
