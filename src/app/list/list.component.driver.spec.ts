@@ -10,10 +10,9 @@ type HTMLMatListOptionElement = HTMLLIElement; // hack, because no material type
 type HTMLMatSelectionListElement = HTMLUListElement; // hack, because no material types exist
 
 export default class ListComponentDriver {
-  // TODO: internalize if possible
-  public component: ListComponent;
-  public element: HTMLElement;
-  public fixture: ComponentFixture<ListComponent>;
+  private component: ListComponent;
+  private element: HTMLElement;
+  private fixture: ComponentFixture<ListComponent>;
 
   public static async setupWithSpies() {
     return ListComponentDriver.setupDriver(true);
@@ -26,11 +25,11 @@ export default class ListComponentDriver {
   private static async setupDriver(useSpies: boolean) {
     const driver = new ListComponentDriver();
     await driver.init(useSpies);
+    await driver.sync();
     return {
       driver,
       component: driver.component,
-      element: driver.element,
-      fixture: driver.fixture
+      element: driver.element
     };
   }
 
@@ -41,6 +40,12 @@ export default class ListComponentDriver {
     this.component = component;
     this.element = element;
     this.fixture = fixture;
+  }
+
+  async sync() {
+    this.fixture.detectChanges();
+    await this.fixture.whenStable();
+    this.fixture.detectChanges();
   }
 
   private async setupTestBed(useSpies: boolean) {
@@ -92,8 +97,9 @@ export default class ListComponentDriver {
     throw new Error(`item "${text}" is neither checked nor unchecked`);
   }
 
-  clickItem(text: string) {
+  async clickItem(text: string) {
     this.getItem(text).click();
+    await this.sync();
   }
 
   private getItem(text: string): HTMLMatListOptionElement {

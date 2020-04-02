@@ -7,7 +7,6 @@ export async function setupTestBed<T>(
 ) {
   await TestBed.configureTestingModule(moduleDef).compileComponents();
   const fixture = TestBed.createComponent(componentClass);
-  fixture.detectChanges(); // TODO: remove if possible;
   const element: HTMLElement = fixture.nativeElement;
   return { fixture, element, component: fixture.componentInstance };
 }

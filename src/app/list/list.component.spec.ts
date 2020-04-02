@@ -6,11 +6,15 @@ import Todo from "./todo";
 
 describe("ListComponent", () => {
   it("creates", async () => {
-    const { driver } = await ListComponentDriver.setupWithSpies();
+    const {
+      driver,
+      component,
+      element
+    } = await ListComponentDriver.setupWithSpies();
 
     expect(driver).toBeTruthy();
-    expect(driver.component).toBeTruthy();
-    expect(driver.element).toBeTruthy();
+    expect(component).toBeTruthy();
+    expect(element).toBeTruthy();
   });
 
   it("initializes with dependencies", async () => {
@@ -62,7 +66,7 @@ describe("ListComponent", () => {
 
   it("renders the item texts from ListService", async () => {
     // TODO: try to reduce input to the minimum
-    const { driver, fixture } = await ListComponentDriver.setupWithSpies();
+    const { driver } = await ListComponentDriver.setupWithSpies();
     const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
     const todos: Todo[] = [
       { id: 1, checked: false, text: "A" },
@@ -73,7 +77,7 @@ describe("ListComponent", () => {
 
     listServiceSpy.getTodos.and.returnValue(todos);
     listServiceSpy.getCheckedIds.and.returnValue(checkedIds);
-    fixture.detectChanges(); // update view from service/class
+    await driver.sync();
 
     const itemTexts = driver.getItemTexts();
     expect(itemTexts).toEqual(todoTexts);
@@ -81,7 +85,7 @@ describe("ListComponent", () => {
 
   it("renders the checkmarks of checked todos", async () => {
     // TODO: try to reduce input to the minimum
-    const { driver, fixture } = await ListComponentDriver.setupWithSpies();
+    const { driver } = await ListComponentDriver.setupWithSpies();
     const listServiceSpy = TestBed.inject(ListService) as Spied<ListService>;
     const todos: Todo[] = [
       { id: 1, checked: false, text: "A" },
@@ -93,9 +97,7 @@ describe("ListComponent", () => {
 
     listServiceSpy.getTodos.and.returnValue(todos);
     listServiceSpy.getCheckedIds.and.returnValue(checkedIds);
-    fixture.detectChanges(); // why the heck are 3 sync steps required!?
-    await fixture.whenStable();
-    fixture.detectChanges();
+    await driver.sync();
 
     const checkedElementTexts = driver.getCheckedItemTexts();
     expect(checkedElementTexts).toEqual(checkedTexts);

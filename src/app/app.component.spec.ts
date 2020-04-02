@@ -34,7 +34,8 @@ describe("AppComponent", () => {
   });
 
   it("provides a link to '/list'", async () => {
-    const { element } = await setupTestBed();
+    const { element, fixture } = await setupTestBed();
+    fixture.detectChanges();
     const routerLinks: HTMLAnchorElement[] = getRouterLinks(element);
     const linksToList: HTMLAnchorElement[] = routerLinks.filter(elem =>
       elem.href.endsWith("/list")
