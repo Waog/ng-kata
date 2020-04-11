@@ -1,15 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from "@angular/core";
+import * as _ from "lodash";
+import { ListService } from "./list.service";
+import Todo from "./todo";
 
 @Component({
-  selector: 'app-list',
-  templateUrl: './list.component.html',
-  styleUrls: ['./list.component.scss']
+  selector: "app-list",
+  templateUrl: "./list.component.html",
+  styleUrls: ["./list.component.scss"]
 })
-export class ListComponent implements OnInit {
+export class ListComponent {
+  constructor(private listService: ListService) {}
 
-  constructor() { }
+  private cachedCheckedTodoIds: number[] = []; // workaround for https://github.com/angular/angular/issues/11097
 
-  ngOnInit(): void {
+  public get todos(): Todo[] {
+    // TODO: use observables instead; (possible with setter?)
+    return this.listService.getTodos();
   }
 
+  public get checkedTodos(): number[] {
+    const result = this.listService.getCheckedIds();
+    if (_.isEqual(result, this.cachedCheckedTodoIds)) {
+      return this.cachedCheckedTodoIds;
+    }
+    this.cachedCheckedTodoIds = result;
+    return result;
+  }
+
+  public set checkedTodos(checkedIds: number[]) {
+    this.listService.setCheckedIds(checkedIds);
+  }
 }

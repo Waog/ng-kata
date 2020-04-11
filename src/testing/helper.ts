@@ -1,31 +1,18 @@
+import { Type } from "@angular/core";
 import { TestBed, TestModuleMetadata } from "@angular/core/testing";
 
-async function setupFixture(
-  componentClass: any,
+export async function setupTestBed<T>(
+  componentClass: Type<T>,
   moduleDef: TestModuleMetadata
 ) {
   await TestBed.configureTestingModule(moduleDef).compileComponents();
   const fixture = TestBed.createComponent(componentClass);
-  return { fixture };
-}
-
-async function setupComponentClass(
-  componentClass: any,
-  moduleDef: TestModuleMetadata
-) {
-  const { fixture } = await setupFixture(componentClass, moduleDef);
-  const component = fixture.componentInstance;
-  return { fixture, component };
-}
-
-async function setupElement(
-  componentClass: any,
-  moduleDef: TestModuleMetadata
-) {
-  const { fixture } = await setupFixture(componentClass, moduleDef);
-  fixture.detectChanges();
   const element: HTMLElement = fixture.nativeElement;
-  return { fixture, element };
+  return { fixture, element, component: fixture.componentInstance };
 }
 
-export default { setupComponentClass, setupElement };
+export function toArray<T extends Node>(nodeList: NodeListOf<T>): T[] {
+  return Array.prototype.slice.call(nodeList);
+}
+
+export default { setupTestBed, toArray };

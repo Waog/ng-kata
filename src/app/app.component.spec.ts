@@ -1,22 +1,16 @@
 import { RouterTestingModule } from "@angular/router/testing";
-import helper from "src/testing/helper";
+import helper, { toArray } from "src/testing/helper";
 import { AppComponent } from "./app.component";
 import { MaterialModule } from "./material/material.module";
 
+// TODO: move test config to test driver
 const componentClass = AppComponent;
 const moduleDef = {
   imports: [RouterTestingModule, MaterialModule],
   declarations: [componentClass]
 };
 
-const setupComponentClass = async () =>
-  helper.setupComponentClass(componentClass, moduleDef);
-
-const setupElement = async () => helper.setupElement(componentClass, moduleDef);
-
-function toArray(nodeList: NodeListOf<HTMLAnchorElement>): HTMLAnchorElement[] {
-  return Array.prototype.slice.call(nodeList);
-}
+const setupTestBed = async () => helper.setupTestBed(componentClass, moduleDef);
 
 function getRouterLinks(parent: HTMLElement): HTMLAnchorElement[] {
   const routerLinks: NodeListOf<HTMLAnchorElement> = parent.querySelectorAll(
@@ -26,21 +20,22 @@ function getRouterLinks(parent: HTMLElement): HTMLAnchorElement[] {
 }
 
 describe("AppComponent", () => {
-  it("should create the app", async () => {
-    const { component } = await setupComponentClass();
+  it("creates the app", async () => {
+    const { component } = await setupTestBed();
 
     expect(component).toBeTruthy();
   });
 
-  it("should render a navigation item 'list'", async () => {
-    const { element } = await setupElement();
+  it("renders a navigation item 'list'", async () => {
+    const { element } = await setupTestBed();
     const routerLinks: HTMLAnchorElement[] = getRouterLinks(element);
     const linkTexts: String[] = routerLinks.map(elem => `${elem.textContent}`);
     expect(linkTexts).toContain("list");
   });
 
-  it("should provide a link to '/list'", async () => {
-    const { element } = await setupElement();
+  it("provides a link to '/list'", async () => {
+    const { element, fixture } = await setupTestBed();
+    fixture.detectChanges();
     const routerLinks: HTMLAnchorElement[] = getRouterLinks(element);
     const linksToList: HTMLAnchorElement[] = routerLinks.filter(elem =>
       elem.href.endsWith("/list")

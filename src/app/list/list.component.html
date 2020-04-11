@@ -1,4 +1,13 @@
-<mat-selection-list>
-  <mat-list-option checkboxPosition="before">Clean up</mat-list-option>
-  <mat-list-option checkboxPosition="before">Homework</mat-list-option>
+<mat-selection-list [(ngModel)]="checkedTodos">
+  <mat-list-option
+    checkboxPosition="before"
+    *ngFor="let todo of todos"
+    [value]="todo.id"
+  >
+    {{ todo.text }}
+  </mat-list-option>
 </mat-selection-list>
+
+<h1>debug:</h1>
+<pre>todos: {{ todos | json }}</pre>
+<pre>checkedTodos: {{ checkedTodos | json }}</pre>
